@@ -12,7 +12,8 @@ router.get('/string', async (ctx, next) => {
 
 router.get('/json', async (ctx, next) => {
   ctx.body = {
-    title: 'koa2 json'
+    status: 200,
+    data:{ name:'张三', age:18 }
   }
 })
 
