@@ -11,6 +11,7 @@ const mongoose = require('mongoose')
 const dbConfig = require('./dbs/config')
 
 const index = require('./routes/index')
+// const person = require('./routes/person')
 const user = require('./routes/user')
 
 // error handler
@@ -30,7 +31,7 @@ app.use(views(__dirname + '/views', {
 app.use(cors({
   origin: function (ctx) {
       // if (ctx.url === '/test') {
-          return "http://localhost:8080"; // 允许来自所有域名请求
+          return "*"; // 允许来自所有域名请求
       // }
       // return "http://localhost:8080"; // 这样就能只允许 http://localhost:8080 这个域名的请求了
   },
@@ -52,6 +53,7 @@ app.use(async (ctx, next) => {
 
 // routes
 app.use(index.routes(), index.allowedMethods())
+// app.use(person.routes(), person.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 
 //mongoose

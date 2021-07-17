@@ -1,8 +1,20 @@
 // sql语句的操作方法,使用时只需引入即可
 const action = {}
+//查询全部数据
 action.query = (_Modal, _query = {}) => {
   return new Promise((resolve, reject) => {
       _Modal.find(_query, (err, res) => {
+       if(err) {  
+            reject(err)
+        }
+        resolve(res)
+      });
+  });
+};
+//查询全部数据
+action.queryOne = (_Modal, _query = {}) => {
+  return new Promise((resolve, reject) => {
+      _Modal.findOne(_query, (err, res) => {
        if(err) {  
             reject(err)
         }
