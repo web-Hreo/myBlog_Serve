@@ -10,9 +10,8 @@ const cors = require('koa2-cors')
 const mongoose = require('mongoose')
 const dbConfig = require('./dbs/config')
 
-const index = require('./routes/index')
-// const person = require('./routes/person')
 const user = require('./routes/user')
+const tags = require('./routes/tags')
 
 // error handler
 onerror(app)
@@ -24,7 +23,6 @@ app.use(bodyparser({
 app.use(json())
 app.use(logger())
 app.use(require('koa-static')(__dirname + '/public'))
-
 app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
@@ -42,19 +40,9 @@ app.use(cors({
   allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }))
 
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  ctx.set("Access-Control-Allow-Origin", "*")//请求资源开放白名单
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
-
 // routes
-app.use(index.routes(), index.allowedMethods())
-// app.use(person.routes(), person.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
+app.use(tags.routes(), tags.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{

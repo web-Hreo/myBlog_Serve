@@ -11,7 +11,7 @@ action.query = (_Modal, _query = {}) => {
       });
   });
 };
-//查询全部数据
+//查询单条数据
 action.queryOne = (_Modal, _query = {}) => {
   return new Promise((resolve, reject) => {
       _Modal.findOne(_query, (err, res) => {
