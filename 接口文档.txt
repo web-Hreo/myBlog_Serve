@@ -1,0 +1,13 @@
+//登录
+http://localhost:3000/user/login
+params: userName passWord
+
+//标签
+//标签-查询
+http://localhost:3000/tags/all
+//标签-新增
+http://localhost:3000/tags/set
+//标签-编辑
+http://localhost:3000/tags/update
+//标签-删除
+http://localhost:3000/tags/delete

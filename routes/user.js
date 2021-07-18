@@ -1,6 +1,7 @@
 const router = require('koa-router')()
 const User = require('../dbs/models/user')
 const UserInfo = require('../dbs/models/userInfo')
+const UserDesc = require('../dbs/models/userDesc')
 const action = require('../dbs/utils')
 router.prefix('/user')//前缀
 //登录
@@ -33,6 +34,31 @@ router.post('/login', async ctx => {
 			results: '请输入账号密码',
 		};
   }
+});
+//获取个人中心 这里只查到userId为1的数据  只查询我自己的数据
+router.get('/desc', async ctx => {
+  const res = await action.query(UserDesc);
+  const heHuaArr = res.find(it =>it.userId===1)
+	ctx.body = {
+    code: 200,
+    success:true,
+    data:heHuaArr.desc
+  }
+});
+//设置个人中心 只设置userId为1的数据
+router.post('/desc', async ctx => {
+	const { desc } = ctx.request.body
+  //去集合内查找当前id用户的desc 若查到 修改  未查到 新增
+  const res = await action.queryOne(UserDesc,{userId:1});
+  if(res){
+    await action.updateOne(UserDesc,{userId:1},{desc});
+  }else{
+    await action.save(new UserDesc({userId:1,desc}));
+  }
+  ctx.body = {
+    code: 200,
+    success:true,
+  };
 });
 
 module.exports = router
