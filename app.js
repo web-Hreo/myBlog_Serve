@@ -12,6 +12,8 @@ const dbConfig = require('./dbs/config')
 
 const user = require('./routes/user')
 const tags = require('./routes/tags')
+const article = require('./routes/article')
+const file = require('./routes/file')
 
 // error handler
 onerror(app)
@@ -43,6 +45,8 @@ app.use(cors({
 // routes
 app.use(user.routes(), user.allowedMethods())
 app.use(tags.routes(), tags.allowedMethods())
+app.use(article.routes(), article.allowedMethods())
+app.use(file.routes(), file.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{

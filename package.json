@@ -21,7 +21,9 @@
     "koa-views": "^6.2.0",
     "koa2-cors": "^2.0.6",
     "mongoose": "^5.13.2",
+    "pm2": "^5.1.0",
     "pug": "^2.0.3",
+    "qiniu": "^7.4.0",
     "rimraf": "^3.0.2"
   },
   "devDependencies": {
