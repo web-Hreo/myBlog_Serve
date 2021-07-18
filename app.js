@@ -14,6 +14,7 @@ const user = require('./routes/user')
 const tags = require('./routes/tags')
 const article = require('./routes/article')
 const file = require('./routes/file')
+const project = require('./routes/project')
 
 // error handler
 onerror(app)
@@ -47,6 +48,7 @@ app.use(user.routes(), user.allowedMethods())
 app.use(tags.routes(), tags.allowedMethods())
 app.use(article.routes(), article.allowedMethods())
 app.use(file.routes(), file.allowedMethods())
+app.use(project.routes(), project.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{
