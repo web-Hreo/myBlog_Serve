@@ -30,16 +30,8 @@ router.get('/byId', async ctx => {
 // 新增文章
 router.post('/add', async ctx => {
 	const { title,viewImg,cont,tag,viewNum } =  ctx.request.body;
-  const params = {
-    title,
-    viewImg,
-    cont,
-    tag,
-    viewNum,
-    createTime: Date.now(),
-    changeTime: Date.now(),
-  }
-  const res = await action.save(new Article(params));
+  const params = { title, viewImg, cont, tag, viewNum}
+  await action.save(new Article(params));
   ctx.body = {
     code: 200,
     success:true
