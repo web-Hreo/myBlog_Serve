@@ -16,6 +16,8 @@ const article = require('./routes/article')
 const file = require('./routes/file')
 const project = require('./routes/project')
 const links = require('./routes/links')
+const navigation = require('./routes/navigation')
+const mood = require('./routes/mood')
 
 // error handler
 onerror(app)
@@ -51,6 +53,8 @@ app.use(article.routes(), article.allowedMethods())
 app.use(file.routes(), file.allowedMethods())
 app.use(project.routes(), project.allowedMethods())
 app.use(links.routes(), links.allowedMethods())
+app.use(navigation.routes(), navigation.allowedMethods())
+app.use(mood.routes(), mood.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{
