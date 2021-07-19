@@ -7,12 +7,18 @@ router.prefix('/article')//前缀
 // 根据标题和标签查询文章列表 查
 router.get('/all', async ctx => {
   console.log(ctx.query);
-  const { title,tag } = ctx.query
-	const res = await action.query(Article,{title:new RegExp(title),tag:new RegExp(tag) });
+  const { title,tag,pageNo,pageSize=10 } = ctx.query
+  const total = await action.queryCount(Article,{title:new RegExp(title),tag:new RegExp(tag)})
+	const data = await action.queryPage(Article,{title:new RegExp(title),tag:new RegExp(tag),pageNo,pageSize });
 	ctx.body = {
     code: 200,
     success:true,
-    data:res
+    data:{
+      pageNo,
+      pageSize,
+      total,
+      data
+    }
   }
 });
 // 根据id查询文章详情 查
