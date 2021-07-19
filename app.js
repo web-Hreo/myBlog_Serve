@@ -15,6 +15,7 @@ const tags = require('./routes/tags')
 const article = require('./routes/article')
 const file = require('./routes/file')
 const project = require('./routes/project')
+const links = require('./routes/links')
 
 // error handler
 onerror(app)
@@ -49,6 +50,7 @@ app.use(tags.routes(), tags.allowedMethods())
 app.use(article.routes(), article.allowedMethods())
 app.use(file.routes(), file.allowedMethods())
 app.use(project.routes(), project.allowedMethods())
+app.use(links.routes(), links.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{
