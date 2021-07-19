@@ -22,8 +22,7 @@ action.queryCount = (_Modal,_query={}) => {
 action.queryPage = (_Modal, _query = {}) => {
   return new Promise((resolve, reject) => {
     console.log('_query',_query);
-    const pageNo = _query.pageNo
-    const  pageSize = _query.pageSize?_query.pageSize:10
+    const { pageNo,pageSize } = _query
     delete _query.pageNo
     delete _query.pageSize
     _Modal.find(_query)

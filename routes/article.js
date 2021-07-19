@@ -14,7 +14,7 @@ router.get('/all', async ctx => {
     code: 200,
     success:true,
     data:{
-      pageNo,
+      pageNo:parseInt(pageNo),
       pageSize,
       total,
       data
