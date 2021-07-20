@@ -5,7 +5,7 @@ const UserInfoSchema  = new mongoose.Schema({
   name:String,
   avatar:String,
   userId:Number,
-  time:{ type:Date, default:Date.now }
+  createTime:String,
 })
 
 module.exports = mongoose.model('userInfo',UserInfoSchema,"userInfo")

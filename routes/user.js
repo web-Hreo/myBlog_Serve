@@ -6,8 +6,7 @@ const action = require('../dbs/utils')
 router.prefix('/user')//前缀
 //登录
 router.post('/login', async ctx => {
-	const res = ctx.request.body;
-	const { userName = '', passWord = '' } = res;
+	const { userName = '', passWord = '' } = ctx.request.body
 	if(userName && passWord) {
 	  const result = 	await action.queryOne(User,{userName,passWord});
     if(result){
@@ -34,6 +33,35 @@ router.post('/login', async ctx => {
 			results: '请输入账号密码',
 		};
   }
+});
+//设置用户账号密码
+router.post('/addUser', async ctx => {
+	const { userName,passWord,userId} = ctx.request.body
+  await action.save(User,{ userName,passWord,userId });
+  ctx.body = {
+    code: 200,
+    success:true,
+    data:'账户新增成功'
+  };
+});
+//设置用户用户信息
+router.post('/addUserInfo', async ctx => {
+	const { address,name,avatar,userId } = ctx.request.body
+  await action.save(UserInfo,{  address,name,avatar,userId });
+  ctx.body = {
+    code: 200,
+    success:true,
+  };
+});
+//更改用户账号密码
+router.post('/updateUser', async ctx => {
+	const { userName,passWord,userId} = ctx.request.body
+  await action.updateOne(User,{ userId },{userName,passWord});
+  ctx.body = {
+    code: 200,
+    success:true,
+    data:'账户新增成功'
+  };
 });
 //获取个人中心 这里只查到userId为1的数据  只查询我自己的数据
 router.get('/desc', async ctx => {
