@@ -37,7 +37,8 @@ router.post('/login', async ctx => {
 //设置用户账号密码
 router.post('/addUser', async ctx => {
 	const { userName,passWord,userId} = ctx.request.body
-  await action.save(User,{ userName,passWord,userId });
+  await action.save(new User({ userName,passWord,userId }));
+
   ctx.body = {
     code: 200,
     success:true,
@@ -47,7 +48,7 @@ router.post('/addUser', async ctx => {
 //设置用户用户信息
 router.post('/addUserInfo', async ctx => {
 	const { address,name,avatar,userId } = ctx.request.body
-  await action.save(UserInfo,{  address,name,avatar,userId });
+  await action.save(new UserInfo({ address,name,avatar,userId }));
   ctx.body = {
     code: 200,
     success:true,
