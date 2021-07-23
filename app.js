@@ -18,6 +18,7 @@ const project = require('./routes/project')
 const links = require('./routes/links')
 const navigation = require('./routes/navigation')
 const mood = require('./routes/mood')
+const public = require('./routes/public')
 
 // error handler
 onerror(app)
@@ -55,6 +56,7 @@ app.use(project.routes(), project.allowedMethods())
 app.use(links.routes(), links.allowedMethods())
 app.use(navigation.routes(), navigation.allowedMethods())
 app.use(mood.routes(), mood.allowedMethods())
+app.use(public.routes(), public.allowedMethods())
 
 //mongoose
 mongoose.connect(dbConfig.dbs,{

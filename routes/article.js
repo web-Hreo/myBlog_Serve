@@ -21,10 +21,12 @@ router.get('/all', async ctx => {
     }
   }
 });
+
 // 根据id查询文章详情 查
 router.get('/byId', async ctx => {
   const { id } = ctx.query
 	const res = await action.queryOne(Article,{_id:id});
+  await action.updateOne(Article,{_id:id},{viewNum:res.viewNum+1});
 	ctx.body = res
 });
 // 新增文章
