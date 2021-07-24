@@ -1,4 +1,10 @@
-//学习资源管理增删改查
+/**
+  @name: 'navigation',
+  @desc: '学习资源管理增删改查'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:08:28,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Navigation = require('../dbs/models/navigation')
 const NavigationTag = require('../dbs/models/navigationTag')

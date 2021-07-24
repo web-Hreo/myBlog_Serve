@@ -1,4 +1,10 @@
-//文章管理管理增删改查
+/**
+  @name: 'project',
+  @desc: '文章管理管理增删改查'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:08:41,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Project = require('../dbs/models/project')
 const action = require('../dbs/utils')
@@ -6,7 +12,6 @@ router.prefix('/project')//前缀
 
 // 查询所有项目列表 查
 router.get('/all', async ctx => {
-  console.log(ctx.query);
 	const res = await action.query(Project);
 	ctx.body = res
 });

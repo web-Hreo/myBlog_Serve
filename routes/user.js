@@ -1,3 +1,10 @@
+/**
+  @name: 'login',
+  @desc: '用户登录 信息增删改查等'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:09:28,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const User = require('../dbs/models/user')
 const UserInfo = require('../dbs/models/userInfo')

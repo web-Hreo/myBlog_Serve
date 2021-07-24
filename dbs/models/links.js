@@ -1,4 +1,10 @@
-//文章管理模型
+/**
+  @name: 'links',
+  @desc: '友链集合'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:06:40,
+  @changeDate: ,
+ */
 const mongoose = require('mongoose')
 
 const LinkSchema  = new mongoose.Schema({

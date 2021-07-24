@@ -1,4 +1,10 @@
-//标签管理增删改查
+/**
+  @name: 'file',
+  @desc: '七牛云上传图片获取token'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:07:37,
+  @changeDate: ,
+ */
 const qiniu = require('qiniu'); // 需要加载qiniu模块的
 const router = require('koa-router')()
 router.prefix('/file')//前缀

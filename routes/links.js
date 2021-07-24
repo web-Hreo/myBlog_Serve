@@ -1,4 +1,10 @@
-//友链管理增删改查
+/**
+  @name: 'links',
+  @desc: '友链管理增删改查'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:08:02,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Links = require('../dbs/models/links')
 const action = require('../dbs/utils')
@@ -6,7 +12,7 @@ router.prefix('/links')//前缀
 
 // 获取所有友链信息 查 
 router.get('/all', async ctx => {
-  const { title,pageNo=1,pageSize=10 } = ctx.query
+  const { title='',pageNo=1,pageSize=10 } = ctx.query
   const total = await action.queryCount(Links,{title:new RegExp(title)})
   const guestNum = await action.queryCount(Links,{type:'常客'})
   const friendNum = await action.queryCount(Links,{type:'亲友'})

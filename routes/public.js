@@ -1,4 +1,10 @@
-//文章管理管理增删改查
+/**
+  @name: 'public',
+  @desc: '公共接口'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:08:55,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Article = require('../dbs/models/article')
 const Tags = require('../dbs/models/tags')

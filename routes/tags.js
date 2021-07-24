@@ -1,4 +1,10 @@
-//标签管理增删改查
+/**
+  @name: 'tags',
+  @desc: '标签管理增删改查'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:09:15,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Tags = require('../dbs/models/tags')
 const action = require('../dbs/utils')

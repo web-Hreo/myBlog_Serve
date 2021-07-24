@@ -1,4 +1,10 @@
-//文章管理模型
+/**
+  @name: 'article',
+  @desc: '文章管理集合'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:06:51,
+  @changeDate: ,
+ */
 const mongoose = require('mongoose')
 
 const ArticleSchema  = new mongoose.Schema({

@@ -1,4 +1,10 @@
-//标签管理增删改查
+/**
+  @name: 'mood',
+  @desc: '日志增删改查'
+  @author: HeHua,
+  @createDate: 2021年07月24日 10:08:14,
+  @changeDate: ,
+ */
 const router = require('koa-router')()
 const Mood = require('../dbs/models/mood')
 const action = require('../dbs/utils')
@@ -15,7 +21,7 @@ router.get('/all', async ctx => {
 });
 // 新增标签
 router.post('/set', async ctx => {
-	const { cont, } = ctx.request.body;
+	const { cont } = ctx.request.body;
   await action.save(new Mood({cont}));
   ctx.body = {
     code: 200,
@@ -24,7 +30,7 @@ router.post('/set', async ctx => {
 });
 // 编辑标签
 router.post('/update', async ctx => {
-	const { _id = '',cont } = ctx.request.body;
+	const { _id,cont } = ctx.request.body;
   await action.updateOne(Mood,{_id},{cont});
   ctx.body = {
     code: 200,
