@@ -9,10 +9,10 @@ const action = {}
  * @returns 
  */
 //查询全部数据 根据_id倒序 
-action.query = (_Modal, _query = {},_sort='_id') => {
-  console.log('_sort',_sort);
+action.query = (_Modal, _query = {},) => {
+  // console.log('_sort',_sort);
   return new Promise((resolve, reject) => {
-    _Modal.find(_query, null, {sort: {_sort: -1}},  (err, res) => {
+    _Modal.find(_query, null, {sort: {'_id': -1}},  (err, res) => {
       err && reject(err)
       resolve(res)
     });
