@@ -7,9 +7,9 @@ router.prefix('/article')//前缀
 // 根据标题和标签查询文章列表 查
 router.get('/all', async ctx => {
   console.log(ctx.query);
-  const { title,tag,pageNo,pageSize=10 } = ctx.query
+  const { title,tag,pageNo,pageSize=10,sort='_id' } = ctx.query
   const total = await action.queryCount(Article,{title:new RegExp(title),tag:new RegExp(tag)})
-	const data = await action.queryPage(Article,{title:new RegExp(title),tag:new RegExp(tag),pageNo,pageSize });
+	const data = await action.queryPage(Article,{title:new RegExp(title),tag:new RegExp(tag),pageNo,pageSize },sort);
 	ctx.body = {
     code: 200,
     success:true,
