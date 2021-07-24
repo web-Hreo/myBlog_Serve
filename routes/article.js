@@ -22,11 +22,14 @@ router.get('/all', async ctx => {
   }
 });
 
-// 根据id查询文章详情 查
+// 根据id查询文章详情 查 每次使用该接口 浏览量+1
 router.get('/byId', async ctx => {
-  const { id } = ctx.query
+  const { id,from='' } = ctx.query
 	const res = await action.queryOne(Article,{_id:id});
-  await action.updateOne(Article,{_id:id},{viewNum:res.viewNum+1});
+  if(from==='pc'){//当前来源为前台应用时 即为用户发省浏览情况 浏览量+1
+    await action.updateOne(Article,{_id:id},{viewNum:res.viewNum+1});
+    res.viewNum=res.viewNum+1
+  }
 	ctx.body = res
 });
 // 新增文章
