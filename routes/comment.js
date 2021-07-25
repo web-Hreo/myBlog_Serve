@@ -50,7 +50,7 @@ router.post('/', async ctx => {
   //查询当前用户在库内最后一条留言
   const currentIpList = await action.queryPage(Comment,{fromIp,pageNo:1,pageSize:1})
   console.log('currentIpList',currentIpList)
-  let differ
+  let differ = 11
   if(currentIpList.length>0){
     differ = parseInt((parseInt(dateNow) - parseInt(currentIpList[0].dateNow)) / 1000).toFixed(0)
   }
@@ -89,6 +89,7 @@ router.post('/', async ctx => {
  */
 router.get('/', async ctx => {
   const { from,fromId='' } = ctx.query
+  console.log(from,fromId);
   const length = await action.queryCount(Comment,{from,fromId});
 	const res = await action.query(Comment,{from,fromId,replyLevel:0});
   const data = JSON.parse(JSON.stringify(res))

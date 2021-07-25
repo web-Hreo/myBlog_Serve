@@ -16,6 +16,10 @@ router.get('/all', async ctx => {
   const { title,tag,pageNo,pageSize=10,sort='_id' } = ctx.query
   const total = await action.queryCount(Article,{title:new RegExp(title),tag:new RegExp(tag)})
 	const data = await action.queryPage(Article,{title:new RegExp(title),tag:new RegExp(tag),pageNo,pageSize },sort);
+  const res = JSON.parse(JSON.stringify(data))
+  res.forEach(it =>{
+    delete it.cont
+  })
 	ctx.body = {
     code: 200,
     success:true,
@@ -23,7 +27,7 @@ router.get('/all', async ctx => {
       pageNo:parseInt(pageNo),
       pageSize,
       total,
-      data
+      data:res
     }
   }
 });
