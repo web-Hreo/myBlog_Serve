@@ -31,6 +31,14 @@ router.get('/all', async ctx => {
     }
   }
 });
+router.get('/archives',async ctx =>{
+  const data = await action.query(Article)
+  ctx.body = {
+    code: 200,
+    success:true,
+    data
+  }
+})
 
 // 根据id查询文章详情 查 每次使用该接口 浏览量+1
 router.get('/byId', async ctx => {

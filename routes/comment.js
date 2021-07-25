@@ -27,6 +27,7 @@ router.get('/friendInfo', async ctx => {
  * @param {来源 应为 article/mood/comment} from 
  * @param {来源id 当from为article/mood时 需要该参数} fromId
  * @param {来源ip} fromIp
+ * @param {是否为博主 默认不是  不需要传} isMaster
  * @param {留言者名字} leavingName
  * @param {留言者邮箱} leavingEmail
  * @param {留言者头像} leavingAvatar
@@ -39,11 +40,16 @@ router.get('/friendInfo', async ctx => {
  * @param {他人名称 当replyLevel不为0时 回复他人必传} replyName
  */
 router.post('/', async ctx => {
-	const {
-    from,fromId,fromIp,
+	let {
+    from,fromId,fromIp,isMaster=false,
     leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
     parentId=0,replyLevel=0,replyName=''
   } = ctx.request.body;
+  //如果为leavingName该名称 则开启博主金标
+  if(leavingName==='/*h*/'){
+    isMaster = true,
+    leavingName = '何华'
+  }
   //生成时间戳
   const dateNow = Date.now()
   console.log('fromIp',fromIp)
@@ -70,7 +76,7 @@ router.post('/', async ctx => {
     const length = await action.queryCount(Comment)
     //生成params 存进留言数据库
     const params = {
-      from,fromId,fromIp,
+      from,fromId,fromIp,isMaster,
       leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
       commentId:length+1, parentId,replyLevel,replyName,dateNow
     }

@@ -11,6 +11,7 @@ const CommentSchema  = new mongoose.Schema({
   from:String,//留言来源 是否来自文章/日志/留言板等
   fromId:String,//留言来源id 若来自文章/日志 那么他需要一个来源id
   fromIp:String,//留言来源IP 同一ip当天留言超过100条 禁止再留言
+  isMaster:Boolean,//用于判断是否开启博主金标
   leavingName:String,//留言者名称
   leavingEmail:String,//留言者邮箱
   leavingAvatar:String,//留言者头像
