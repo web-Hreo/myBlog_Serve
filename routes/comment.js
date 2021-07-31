@@ -61,31 +61,40 @@ router.post('/', async ctx => {
     differ = parseInt((parseInt(dateNow) - parseInt(currentIpList[0].dateNow)) / 1000).toFixed(0)
   }
   console.log('differ',differ)
-  if(!differ || differ<10){
+  if(fromIp==='175.10.185.127'){
     ctx.body = {
       code: 200,
       success:false,
-      data:'留言相差时间应不小于10s'
+      data:'此ip已被永封'
     }
   }else{
-    //查询当前用户在库内是否存在
-    const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
-    //用户不存在即入库 方便后期回复他人操作查找
-    !friend && await action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
-    //查找留言库 数据长度生成id
-    const length = await action.queryCount(Comment)
-    //生成params 存进留言数据库
-    const params = {
-      from,fromId,fromIp,isMaster,
-      leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
-      commentId:length+1, parentId,replyLevel,replyName,dateNow
-    }
-    await action.save(new Comment(params))
-    ctx.body = {
-      code: 200,
-      success:true,
+    if(!differ || differ<10){
+      ctx.body = {
+        code: 200,
+        success:false,
+        data:'留言相差时间应不小于10s'
+      }
+    }else{
+      //查询当前用户在库内是否存在
+      const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
+      //用户不存在即入库 方便后期回复他人操作查找
+      !friend && await action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
+      //查找留言库 数据长度生成id
+      const length = await action.queryCount(Comment)
+      //生成params 存进留言数据库
+      const params = {
+        from,fromId,fromIp,isMaster,
+        leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
+        commentId:length+1, parentId,replyLevel,replyName,dateNow
+      }
+      await action.save(new Comment(params))
+      ctx.body = {
+        code: 200,
+        success:true,
+      }
     }
   }
+
 
 });
 
@@ -114,12 +123,29 @@ router.get('/', async ctx => {
 });
 // 获取所有留言信息
 router.get('/all', async ctx => {
-	const res = await action.query(Comment);
+  const { from,pageNo=1,pageSize=10} = ctx.query
+  const total = await action.queryCount(Comment,{from:new RegExp(from)})
+	const res = await action.queryPage(Comment,{from:new RegExp(from),pageNo,pageSize});
 	ctx.body = {
     code: 200,
     success:true,
-    data:res
+    data:{
+      pageNo:parseInt(pageNo),
+      pageSize:parseInt(pageSize),
+      total,
+      data:res
+    }
   }
 });
+//删除留言信息
+router.post('/delete', async ctx => {
+  const { _id } = ctx.request.body;
+  await action.deleteOne(Comment, { _id});
+	ctx.body = {
+    code: 200,
+    success:true,
+  }
+});
+
 
 module.exports = router
