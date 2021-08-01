@@ -9,6 +9,7 @@ const router = require('koa-router')()
 const FriendInfo = require('../dbs/models/friendInfo')
 const Comment = require('../dbs/models/comment')
 const action = require('../dbs/utils')
+const email = require('../config/sendEmail'); //引入封装好的函数
 router.prefix('/comment')//前缀
 
 
@@ -34,6 +35,7 @@ router.get('/friendInfo', async ctx => {
  * @param {留言者输入内容} leavingCont
  * @param {留言者可访问网站} leavingUrl
  * 
+ * @param { 当层级为2时 会传来LV2Id 2级回复id } LV2Id
  * @param {留言id 无需用户传 会自己生成} commentId
  * @param {父级留言id 默认为0 如果回复他人传他人id做为父id} parentId
  * @param {回复层级 默认0为留言 1为1级回复 2为2级回复} replyLevel
@@ -43,12 +45,14 @@ router.post('/', async ctx => {
 	let {
     from,fromId,fromIp,isMaster=false,
     leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
-    parentId=0,replyLevel=0,replyName=''
+    LV2Id=null,parentId=0,replyLevel=0,replyName=''
   } = ctx.request.body;
   //如果为leavingName该名称 则开启博主金标
   if(leavingName==='/*h*/'){
     isMaster = true,
     leavingName = '何华'
+    leavingAvatar ='http://q.qlogo.cn/headimg_dl?dst_uin=1194150512@qq.com&spec=100'
+    leavingEmail ='1194150512@qq.com'
   }
   //生成时间戳
   const dateNow = Date.now()
@@ -60,38 +64,37 @@ router.post('/', async ctx => {
   if(currentIpList.length>0){
     differ = parseInt((parseInt(dateNow) - parseInt(currentIpList[0].dateNow)) / 1000).toFixed(0)
   }
-  console.log('differ',differ)
-  if(fromIp==='175.10.185.127'){
+  if(!differ || differ<10){
     ctx.body = {
       code: 200,
       success:false,
-      data:'此ip已被永封'
+      data:'留言相差时间应不小于10s'
     }
   }else{
-    if(!differ || differ<10){
-      ctx.body = {
-        code: 200,
-        success:false,
-        data:'留言相差时间应不小于10s'
-      }
+    //查询当前用户在库内是否存在
+    // const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
+    // //用户不存在即入库 方便后期回复他人操作查找
+    // !friend && await action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
+    //查找留言库 数据长度生成id
+    //生成params 存进留言数据库
+    const params = {
+      from,fromId,fromIp,isMaster,
+      leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
+      commentId:Date.now(), parentId,replyLevel,replyName,dateNow
+    }
+    await action.save(new Comment(params))
+    if(replyLevel ==0 && isMaster){
+      
     }else{
-      //查询当前用户在库内是否存在
-      const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
-      //用户不存在即入库 方便后期回复他人操作查找
-      !friend && await action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
-      //查找留言库 数据长度生成id
-      const length = await action.queryCount(Comment)
-      //生成params 存进留言数据库
-      const params = {
-        from,fromId,fromIp,isMaster,
-        leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
-        commentId:length+1, parentId,replyLevel,replyName,dateNow
-      }
-      await action.save(new Comment(params))
-      ctx.body = {
-        code: 200,
-        success:true,
-      }
+      //当层级为1时 查找parentId值 为2时 查找LV2Id值
+      const commentId = replyLevel===1?parentId:LV2Id
+      const reply = await action.queryOne(Comment,{commentId})
+      reply && (params.reply = reply)
+      await timeout(params)
+    }
+    ctx.body = {
+      code: 200,
+      success:true,
     }
   }
 
@@ -103,13 +106,13 @@ router.post('/', async ctx => {
  * @param {来源id 当from为article/mood时 需要该参数} fromId
  */
 router.get('/', async ctx => {
-  const { from,fromId='' } = ctx.query
+  const { from='article',fromId='' } = ctx.query
   console.log(from,fromId);
-  const length = await action.queryCount(Comment,{from,fromId});
-	const res = await action.query(Comment,{from,fromId,replyLevel:0});
+  const length = await action.queryCount(Comment,{from:new RegExp(from),fromId:new RegExp(fromId)});
+	const res = await action.query(Comment,{from:new RegExp(from),fromId:new RegExp(fromId),replyLevel:0});
   const data = JSON.parse(JSON.stringify(res))
   for (const item of data) {
-	  const result = await action.query(Comment,{from,fromId,parentId:item.commentId});
+	  const result = await action.query(Comment,{from:new RegExp(from),fromId:new RegExp(fromId),parentId:item.commentId});
     item.children = result
   }
 	ctx.body = {
@@ -146,6 +149,28 @@ router.post('/delete', async ctx => {
     success:true,
   }
 });
+//发送邮件
+// router.post('/email', async (ctx, next) => {
+//   const {mail} = ctx.request.body
+//   console.log(mail);
+//   if (!mail) {
+//       return ctx.body = '参数错误' //email出错时或者为空时
+//   }
+  async function timeout(info) {
+      return new Promise((resolve, reject) => {
+          email.sendMail(info, (state) => {
+              resolve(state);
+          })
+      })
+  }
+  // await timeout().then(state => {
+  //     if (state) {
+  //         return ctx.body = "发送成功"
+  //     } else {
+  //         return ctx.body = "失败"
+  //     }
+  // })
+// })
 
 
 module.exports = router
