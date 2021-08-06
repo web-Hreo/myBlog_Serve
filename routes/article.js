@@ -33,45 +33,56 @@ router.get('/all', async ctx => {
 });
 //获取文章归档  根据年月分类 @createTime 2021-07-06 1:21
 router.get('/archives',async ctx =>{
-  const yearMap = ['2021','2022','2023','2024']//定义需要查询的年份
-  const monthMap = ['01','02','03','04','05','06','07','08','09','10','11','12']//定义需要查询的月份
-  const list = []
-  //循环年份yearMap
-  for (const item of yearMap) {
-    //查找年份yearMap内 属于年份的数据 不需要返回 真是返回的应该是月份数据
-    const yearData = await action.query(Article,{createTime:new RegExp(item)})
-    //若查询到当年年份数据后
-    if(yearData.length){
-      //定义查询到的年份子数据空data 用于存放月份数据 因为年份查找了 必存在月份数据
-      const yearDataList = {
-        year:item,
-        data:[]
-      }
-      // console.log(`当前数据库内 ${item}年份文章`,yearData);
-      // console.log('已查询到年份列表',yearDataList);
-      //查找年份monthMap内 属于当前年份月份的数据
-      for (const key of monthMap) {
-        const month = `${item}-${key}`//定义需要查询的月份
-        const monthData = await action.query(Article,{createTime:new RegExp(month)})
-        monthData.length && console.log(`已查询到${month}月份数据`,monthData);
-        //当月份数据长度大于0时 当前月份有数据 那么定义月份数据list插入年份list
-        //删除文章内cont 因为是列表 
-        // monthData.forEach(it =>{ delete it.cont })
-        if(monthData.length){
-          const monthDataCopy = JSON.parse(JSON.stringify(monthData))
-          monthDataCopy.forEach(it =>{ delete it.cont })
-          console.log(`已查询的当前monthData数据`,monthData);
-          console.log(`已删除cont的monthData数据`,monthDataCopy);
-          const monthDataList = {
-            month,
-            data:monthDataCopy
-          }
-          yearDataList.data.push(monthDataList)
-        }
-      }
-      list.push(yearDataList)
+  // const yearMap = ['2021','2022','2023','2024']//定义需要查询的年份
+  // const monthMap = ['01','02','03','04','05','06','07','08','09','10','11','12']//定义需要查询的月份
+  // const list = []
+  // //循环年份yearMap
+  // for (const item of yearMap) {
+  //   //查找年份yearMap内 属于年份的数据 不需要返回 真是返回的应该是月份数据
+  //   const yearData = await action.query(Article,{createTime:new RegExp(item)})
+  //   //若查询到当年年份数据后
+  //   if(yearData.length){
+  //     //定义查询到的年份子数据空data 用于存放月份数据 因为年份查找了 必存在月份数据
+  //     const yearDataList = {
+  //       year:item,
+  //       data:[]
+  //     }
+  //     // console.log(`当前数据库内 ${item}年份文章`,yearData);
+  //     // console.log('已查询到年份列表',yearDataList);
+  //     //查找年份monthMap内 属于当前年份月份的数据
+  //     for (const key of monthMap) {
+  //       const month = `${item}-${key}`//定义需要查询的月份
+  //       const monthData = await action.query(Article,{createTime:new RegExp(month)})
+  //       monthData.length && console.log(`已查询到${month}月份数据`,monthData);
+  //       //当月份数据长度大于0时 当前月份有数据 那么定义月份数据list插入年份list
+  //       //删除文章内cont 因为是列表 
+  //       // monthData.forEach(it =>{ delete it.cont })
+  //       if(monthData.length){
+  //         const monthDataCopy = JSON.parse(JSON.stringify(monthData))
+  //         monthDataCopy.forEach(it =>{ delete it.cont })
+  //         console.log(`已查询的当前monthData数据`,monthData);
+  //         console.log(`已删除cont的monthData数据`,monthDataCopy);
+  //         const monthDataList = {
+  //           month,
+  //           data:monthDataCopy
+  //         }
+  //         yearDataList.data.push(monthDataList)
+  //       }
+  //     }
+  //     list.push(yearDataList)
+  //   }
+  // }
+  const res = await action.query(Article)
+  const list = res.map(it =>{
+    return {
+      title:it.title,
+      _id:it._id,
+      createTime:it.createTime
     }
-  }
+  })
+  console.log('====================================');
+  console.log('list',list);
+  console.log('====================================');
   ctx.body = {
     code: 200,
     success:true,
