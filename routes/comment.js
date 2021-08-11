@@ -13,6 +13,13 @@ const email = require('../config/sendEmail'); //引入封装好的函数
 const axios = require('axios');
 router.prefix('/comment')//前缀
 const key = 'BBFBZ-TMFE4-2Z4UK-XB6ID-K7XJZ-ONBGJ'
+const xssList = [//恶意评论列表
+  '<div>','<img>','<iframe>','<>','console.log','xss',
+  '</','document','cookie','javascript','<script>','text/javascript',
+  'and','END','exec','EXEC','insert','INSERT','select','SELECT',
+  'delete','DELETE','update','UPDATE','import','IMPORT','query','QUERY',
+  'java','php','JAVA','PHP','COOKIE','LOG','log'
+]
 
 
 // 获取留言用户信息
@@ -49,72 +56,75 @@ router.post('/', async ctx => {
     leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
     LV2Id=null,parentId=0,replyLevel=0,replyName=''
   } = ctx.request.body;
-  const apiUrl = `https://apis.map.qq.com/ws/location/v1/ip?key=${key}&ip=${fromIp}&output=json`
-  const {data} = await axios.get(apiUrl)
-  console.log('data1111111111',data);
-  if(data.status==0){
-    console.log('1111111111111111111111111111111111');
-    //如果为leavingName该名称 则开启博主金标
-    if(leavingName==='/*h*/'){
-      isMaster = true,
-      leavingName = '何华'
-      leavingAvatar ='http://q.qlogo.cn/headimg_dl?dst_uin=1194150512@qq.com&spec=100'
-      leavingEmail ='1194150512@qq.com'
-    }
-    //生成时间戳
-    const dateNow = Date.now()
-    console.log('fromIp',fromIp)
-    //查询当前用户在库内最后一条留言
-    const currentIpList = await action.queryPage(Comment,{fromIp,pageNo:1,pageSize:1})
-    console.log('currentIpList',currentIpList)
-    let differ = 11
-    if(currentIpList.length>0){
-      differ = parseInt((parseInt(dateNow) - parseInt(currentIpList[0].dateNow)) / 1000).toFixed(0)
-    }
-    if(!differ || differ<10){
-      ctx.body = {
-        code: 200,
-        success:false,
-        data:'留言相差时间应不小于10s'
+  const Xss = checkXss(leavingCont)
+  if(Xss){
+    console.log('checkXss',Xss);
+    ctx.body = Xss
+  }else{
+    const apiUrl = `https://apis.map.qq.com/ws/location/v1/ip?key=${key}&ip=${fromIp}&output=json`
+    const {data} = await axios.get(apiUrl)
+    if(data.status==0){
+      //如果为leavingName该名称 则开启博主金标
+      if(leavingName==='/*h*/'){
+        isMaster = true,
+        leavingName = '何华'
+        leavingAvatar ='http://q.qlogo.cn/headimg_dl?dst_uin=1194150512@qq.com&spec=100'
+        leavingEmail ='1194150512@qq.com'
+      }
+      //生成时间戳
+      const dateNow = Date.now()
+      console.log('fromIp',fromIp)
+      //查询当前用户在库内最后一条留言
+      const currentIpList = await action.queryPage(Comment,{fromIp,pageNo:1,pageSize:1})
+      console.log('currentIpList',currentIpList)
+      let differ = 11
+      if(currentIpList.length>0){
+        differ = parseInt((parseInt(dateNow) - parseInt(currentIpList[0].dateNow)) / 1000).toFixed(0)
+      }
+      if(!differ || differ<10){
+        ctx.body = errorBody()
+      }else{
+        //查询当前用户在库内是否存在
+        const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
+        //用户不存在即入库 方便后期回复他人操作查找
+        !friend && action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
+        //查找留言库 数据长度生成id
+        //生成params 存进留言数据库
+        const params = {
+          from,fromId,fromIp,isMaster,
+          leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
+          commentId:Date.now(), parentId,replyLevel,replyName,dateNow
+        }
+        action.save(new Comment(params))
+        if(replyLevel ==0 && isMaster){
+          ctx.body = successBody()
+        }else{
+          //当层级为1时 查找parentId值 为2时 查找LV2Id值
+          const commentId = replyLevel===1?parentId:LV2Id
+          const reply = await action.queryOne(Comment,{commentId})
+          reply && (params.reply = reply)
+          ctx.body = successBody()
+          timeout(params)
+        }
       }
     }else{
-      //查询当前用户在库内是否存在
-      // const friend = await action.queryOne(FriendInfo,{leavingName,leavingEmail})
-      // //用户不存在即入库 方便后期回复他人操作查找
-      // !friend && await action.save(new FriendInfo({leavingName,leavingEmail,leavingAvatar}))
-      //查找留言库 数据长度生成id
-      //生成params 存进留言数据库
-      const params = {
-        from,fromId,fromIp,isMaster,
-        leavingName,leavingEmail,leavingAvatar,leavingCont,leavingUrl,
-        commentId:Date.now(), parentId,replyLevel,replyName,dateNow
-      }
-      await action.save(new Comment(params))
-      if(replyLevel ==0 && isMaster){
-        
-      }else{
-        //当层级为1时 查找parentId值 为2时 查找LV2Id值
-        const commentId = replyLevel===1?parentId:LV2Id
-        const reply = await action.queryOne(Comment,{commentId})
-        reply && (params.reply = reply)
-        await timeout(params)
-      }
-      ctx.body = {
-        code: 200,
-        success:true,
-      }
-    }
-  }else{
-    ctx.body = {
-      code: 500,
-      success:false,
-      data:'请求异常，请稍后重试'
+      ctx.body = errorBody()
     }
   }
 
-
-
 });
+  //校验xss
+function checkXss(cont){
+  for (const it of xssList) {
+    if(cont.indexOf(it) !==-1){
+      return errorBody()
+    } 
+  }
+ }
+  //校验ip地址
+
+
+
 
 /**
  * @param {来源 应为 article/mood/comment} from 
@@ -159,10 +169,7 @@ router.get('/all', async ctx => {
 router.post('/delete', async ctx => {
   const { _id } = ctx.request.body;
   await action.deleteOne(Comment, { _id});
-	ctx.body = {
-    code: 200,
-    success:true,
-  }
+	ctx.body = successBody()
 });
 //发送邮件
 // router.post('/email', async (ctx, next) => {
@@ -187,5 +194,18 @@ router.post('/delete', async ctx => {
   // })
 // })
 
+function errorBody(){
+  return{
+   code: 500,
+   success:false,
+   data:'请求异常，请稍后重试'
+ }
+}
+function successBody(){
+ return{
+   code: 200,
+   success:true,
+ }
+}
 
 module.exports = router
