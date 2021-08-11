@@ -80,9 +80,6 @@ router.get('/archives',async ctx =>{
       createTime:it.createTime
     }
   })
-  console.log('====================================');
-  console.log('list',list);
-  console.log('====================================');
   ctx.body = {
     code: 200,
     success:true,
