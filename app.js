@@ -36,14 +36,16 @@ app.use(views(__dirname + '/views', {
 }))
 app.use(cors({
   origin: function (ctx) {
-      // if (ctx.url === '/test') {
-          return "*"; // 允许来自所有域名请求
-      // }
-      // return "http://localhost:8080"; // 这样就能只允许 http://localhost:8080 这个域名的请求了
+    const whiteList = ['http://www.heblogs.cn','http://admin.heblogs.cn','http://localhost:8080','http://localhost:3001']; //可跨域白名单
+    let url = ctx.header.origin;
+    if(whiteList.includes(url)){
+        return url //注意，这里域名末尾不能带/，否则不成功，所以在之前我把/通过substr干掉了
+    }
+      return "http://localhost:3001"; // 默认本地
   },
   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
   maxAge: 5,
-  // credentials: true, // 当设置成允许请求携带cookie时，需要保证"Access-Control-Allow-Origin"是服务器有的域名，而不能是"*";
+  credentials: false, // 当设置成允许请求携带cookie时，需要保证"Access-Control-Allow-Origin"是服务器有的域名，而不能是"*";
   allowMethods: ['GET', 'POST', 'DELETE'],
   allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }))
